@@ -27,7 +27,7 @@ def reccomend(file, price, cuisines_list):
 def sortByRatings(names_final, name_to_rating):
     finalList = []
     for name in names_final:
-        rating = name_to_rating[name]
+        rating = int(name_to_rating[name].strip("%"))
         finalList += [[rating, name]]
     return sorted(finalList, key=itemgetter(0), reverse=True)
 
