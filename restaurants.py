@@ -1,3 +1,5 @@
+from operator import itemgetter
+from typing import final
 
 
 FILENAME = "restaurants.txt"
@@ -8,6 +10,36 @@ def reccomend(file, price, cuisines_list):
     name_to_rating, price_to_names, cuisines_to_names = read_restaurants(file)
 
     names_matching_price = price_to_names[price]
+    names_matching_cuisines = []
+    for cuisine in cuisines_list:
+        if len(names_matching_cuisines) > 0:
+            names_matching_cuisines += cuisines_to_names[cuisine]
+        else:
+            names_matching_cuisines = cuisines_to_names[cuisine]
+    names_matching_cuisines = list(dict.fromkeys(names_matching_cuisines))
+    names_final = filter_by_cuisine(
+        names_matching_price, cuisines_to_names, cuisines_list)
+
+    rating_matching_names = sortByRatings(names_final, name_to_rating)
+    return rating_matching_names
+
+
+def sortByRatings(names_final, name_to_rating):
+    finalList = []
+    for name in names_final:
+        rating = name_to_rating[name]
+        finalList += [[rating, name]]
+    return sorted(finalList, key=itemgetter(0), reverse=True)
+
+
+def filter_by_cuisine(names_matching_price, cuisines_to_names, cuisines_list):
+    toReturn = []
+    for cuisine in cuisines_list:
+        for name in cuisines_to_names[cuisine]:
+            if name in names_matching_price:
+                toReturn = list(dict.fromkeys(
+                    toReturn + cuisines_to_names[cuisine]))
+    return toReturn
 
 
 def read_restaurants(file):
@@ -33,4 +65,4 @@ def read_restaurants(file):
         return restaurant_ratings, restaurant_price, restaurant_cuisine
 
 
-print(reccomend(FILENAME, "$", ["Mexican", "Malaysian", "Chinese", "Thai"]))
+print(reccomend(FILENAME, "$", ["Malaysian", "Chinese"]))
